@@ -18,8 +18,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                  docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                  docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                    docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
                 '''
             }
         }
@@ -31,23 +31,28 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PAT'
                 )]) {
-                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PAT'
+                    sh '''
+                        echo $DOCKER_PAT | docker login -u $DOCKER_USER --password-stdin
+                    '''
                 }
             }
         }
 
-        stage('Push Image') {
+        stage('Push Image to Docker Hub') {
             steps {
                 sh '''
-                  docker push $IMAGE_NAME:$IMAGE_TAG
-                  docker push $IMAGE_NAME:latest
+                    docker push $IMAGE_NAME:$IMAGE_TAG
+                    docker push $IMAGE_NAME:latest
                 '''
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl set image deployment/auro-travelguide web=$IMAGE_NAME:$IMAGE_TAG'
+                sh '''
+                    kubectl set image deployment/auro-travelguide \
+                    web=$IMAGE_NAME:$IMAGE_TAG
+                '''
             }
         }
     }
