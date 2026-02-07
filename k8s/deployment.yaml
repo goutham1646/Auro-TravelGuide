@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auro-travelguide
+  labels:
+    app: auro-travelguide
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auro-travelguide
+  template:
+    metadata:
+      labels:
+        app: auro-travelguide
+    spec:
+      containers:
+      - name: web                # 🔴 MUST MATCH Jenkinsfile
+        image: gouthamkumarsai/auro-travelguide:latest
+        ports:
+        - containerPort: 80
+
