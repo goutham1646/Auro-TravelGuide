@@ -651,6 +651,27 @@
         </div>
     </footer>
 
+    <!-- Chatbot -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <h3>🌿 Travel Assistant</h3>
+            <button class="chatbot-close" id="closeChatbot">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chatbot-message bot-message">
+                <p>Namaste! 👋 I'm your travel assistant. Ask me anything about Auroville, beaches, cafes, timings, food options, or directions!</p>
+            </div>
+        </div>
+        <div class="chatbot-input-container">
+            <input type="text" id="chatbotInput" placeholder="Ask me about Auroville, beaches, cafes..." />
+            <button id="sendMessage">Send</button>
+        </div>
+    </div>
+    <button class="chatbot-toggle" id="chatbotToggle">
+        <span>💬</span>
+        <span class="chatbot-badge">1</span>
+    </button>
+
     <script>
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -664,6 +685,137 @@
                     });
                 }
             });
+        });
+
+        // Chatbot functionality
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const closeChatbot = document.getElementById('closeChatbot');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const sendMessage = document.getElementById('sendMessage');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+
+        // Toggle chatbot
+        chatbotToggle.addEventListener('click', () => {
+            chatbotContainer.classList.toggle('active');
+        });
+
+        closeChatbot.addEventListener('click', () => {
+            chatbotContainer.classList.remove('active');
+        });
+
+        // Chatbot knowledge base
+        const knowledgeBase = {
+            'auroville': {
+                keywords: ['auroville', 'matrimandir', 'visitor center', 'visitor\'s center'],
+                response: 'Auroville is an experimental township founded in 1968. The iconic Matrimandir (golden sphere) requires advance registration. Visitor Center timings: 9 AM to 5 PM daily. Entry is free, but Matrimandir viewing needs prior registration. Best time to visit: November to February, early morning (8-10 AM) or late afternoon (4-5 PM).'
+            },
+            'serenity beach': {
+                keywords: ['serenity beach', 'serenity'],
+                response: 'Serenity Beach is a peaceful, less crowded beach about 4 km from Auroville. Free entry, open 24 hours (recommended: 6 AM to 7 PM). Best time: Early morning for sunrise or late afternoon for sunset. No lifeguards, so be cautious while swimming. Limited facilities - carry your own water and snacks.'
+            },
+            'auroville beach': {
+                keywords: ['auroville beach', 'auro beach'],
+                response: 'Auroville Beach (Auro Beach) is 3 km from Auroville Visitor Center. Free entry, open 24 hours. Best time: Early morning (6-9 AM) or late afternoon (4-7 PM). Has basic facilities including restaurants and parking. Good for swimming and beach activities.'
+            },
+            'cafes': {
+                keywords: ['cafe', 'cafes', 'bakery', 'restaurant', 'restaurants', 'food', 'eat', 'dining'],
+                response: 'Famous cafes in Auroville: 1) Auroville Bakery (8 AM-6 PM) - fresh organic bread, pastries, coffee. 2) Bread & Chocolate (8 AM-7 PM) - chocolate treats and coffee. 3) Naturellement (9 AM-6 PM) - organic vegetarian meals. 4) Cafe des Arts (10 AM-8 PM) - continental cuisine. 5) Marc\'s Cafe (8 AM-6 PM) - organic food and juices. Most cafes are cash-only.'
+            },
+            'matrimandir': {
+                keywords: ['matrimandir', 'golden sphere', 'meditation'],
+                response: 'Matrimandir is the iconic golden sphere, the spiritual heart of Auroville. Free entry but requires advance registration at Visitor Center (opens 9 AM, slots fill quickly). Timings: 9 AM to 5 PM by appointment. Modest dress code required (shoulders and knees covered). Photography restricted inside.'
+            },
+            'timings': {
+                keywords: ['timing', 'timings', 'time', 'hours', 'open', 'closed', 'when'],
+                response: 'Auroville Visitor Center: 9 AM to 5 PM daily. Matrimandir: 9 AM to 5 PM (by appointment). Cafes: Most open 8-9 AM, close 6-8 PM. Beaches: Open 24 hours (recommended 6 AM to 7 PM). Best visiting time: November to February, early morning or late afternoon.'
+            },
+            'entry': {
+                keywords: ['entry', 'fee', 'price', 'cost', 'free', 'paid', 'ticket', 'permission'],
+                response: 'Auroville entry is FREE. Matrimandir viewing is FREE but requires advance registration. Beaches are FREE. Most cafes and restaurants have budget-friendly to moderate pricing (Rs. 50-1000 per person). No entry tickets needed for most places.'
+            },
+            'directions': {
+                keywords: ['direction', 'directions', 'how to reach', 'location', 'where', 'map', 'route'],
+                response: 'Auroville is near Puducherry. Use the "Get Directions" buttons on the website for Google Maps navigation. Auroville Visitor Center is the starting point. Serenity Beach is 4 km from Auroville, Auroville Beach is 3 km. All locations have direction links on the website.'
+            },
+            'food': {
+                keywords: ['food', 'cuisine', 'what to eat', 'try', 'dishes', 'menu'],
+                response: 'Must try: Fresh organic bread from Auroville Bakery, wood-fired pizza from Tanto Pizzeria, organic vegetarian thali at Solar Kitchen, fresh coconut water from vendors, local filter coffee. Popular restaurants: Tanto Pizzeria (Italian), La Piscine (French/Continental), Solar Kitchen (organic vegetarian).'
+            },
+            'hotels': {
+                keywords: ['hotel', 'hotels', 'stay', 'accommodation', 'guest house', 'lodging'],
+                response: 'Auroville Guest Houses: Budget-friendly (Rs. 800-2000/night), advance booking recommended. Hotels near Auroville Main Road: Multiple options (Rs. 1000-2500/night). Beachside guesthouses near Serenity Beach: Limited options (Rs. 1500-3000/night).'
+            },
+            'tips': {
+                keywords: ['tip', 'tips', 'advice', 'suggest', 'recommend', 'should'],
+                response: 'Tips: 1) Register Matrimandir viewing online or arrive before 9 AM. 2) Carry cash (most places don\'t accept cards). 3) Wear comfortable walking shoes. 4) Visit weekdays to avoid crowds. 5) Respect silence zones. 6) Carry water bottles. 7) Modest dress code for Matrimandir. 8) Book accommodations in advance.'
+            },
+            'best time': {
+                keywords: ['best time', 'when to visit', 'season', 'weather'],
+                response: 'Best time to visit: November to February (pleasant weather). Best hours: Early morning (8-10 AM) or late afternoon (4-5 PM) to avoid crowds. Avoid: Peak summer (April-June) due to extreme heat. Weekdays are less crowded than weekends.'
+            }
+        };
+
+        // Function to find matching response
+        function getResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Check for matches in knowledge base
+            for (const [key, data] of Object.entries(knowledgeBase)) {
+                for (const keyword of data.keywords) {
+                    if (lowerMessage.includes(keyword)) {
+                        return data.response;
+                    }
+                }
+            }
+
+            // Default responses for common questions
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                return 'Hello! 👋 How can I help you with your Auroville travel plans?';
+            }
+            
+            if (lowerMessage.includes('thank')) {
+                return 'You\'re welcome! 🌿 Have a wonderful time exploring Auroville!';
+            }
+
+            if (lowerMessage.includes('bye') || lowerMessage.includes('goodbye')) {
+                return 'Goodbye! Safe travels! 🌊✨';
+            }
+
+            // Default response
+            return 'I can help you with information about Auroville, beaches, cafes, timings, entry details, directions, food options, and travel tips. Try asking about specific places or topics!';
+        }
+
+        // Add message to chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chatbot-message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatbotMessages.appendChild(messageDiv);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        // Send message
+        function sendChatMessage() {
+            const message = chatbotInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                chatbotInput.value = '';
+                
+                // Simulate thinking delay
+                setTimeout(() => {
+                    const response = getResponse(message);
+                    addMessage(response, false);
+                }, 500);
+            }
+        }
+
+        // Event listeners
+        sendMessage.addEventListener('click', sendChatMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
         });
     </script>
 </body>
